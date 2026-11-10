@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generador de Contraseñas Seguras</title>
+  <meta name="description" content="Generador de contraseñas seguras y gratis. Crea contraseñas aleatorias fuertes y comprueba la fuerza de tu propia contraseña. Todo funciona en tu navegador.">
+  <link rel="alternate" hreflang="en" href="https://tudominio.com/" />
+  <link rel="alternate" hreflang="es" href="https://tudominio.com/es/" />
+  <link rel="alternate" hreflang="x-default" href="https://tudominio.com/" />
+  <style>
+    body {
+      font-family: "Times New Roman", Times, serif;
+      background-color: #c0c0c0;
+      background-image:
+        repeating-linear-gradient(45deg, #b8b8b8 0px, #b8b8b8 2px, #c0c0c0 2px, #c0c0c0 4px);
+      color: #000000;
+      margin: 20px;
+      padding: 0;
+    }
+
+    .card {
+      max-width: 900px;
+      margin: 40px auto;
+      background-color: #ffffff;
+      border: 3px ridge #808080;
+      padding: 25px;
+    }
+
+    h1 {
+      font-family: "Times New Roman", Times, serif;
+      font-size: 1.6rem;
+      text-align: center;
+      text-decoration: underline;
+      margin-top: 0;
+      color: #000080;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid #808080;
+      border-bottom: 1px solid #ffffff;
+      margin: 15px 0;
+    }
+
+    .columnas {
+      display: flex;
+      gap: 25px;
+      flex-wrap: wrap;
+    }
+
+    .columna {
+      flex: 1 1 320px;
+      min-width: 0;
+    }
+
+    .columna h2 {
+      font-size: 1.1rem;
+      text-decoration: underline;
+      color: #000080;
+      margin-top: 0;
+    }
+
+    label {
+      display: block;
+      margin: 10px 0 4px;
+      font-size: 1rem;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: #000080;
+    }
+
+    .panel-exclusiones {
+      margin: 12px 0;
+      padding: 12px;
+      background-color: #f0f0f0;
+      border: 1px inset #808080;
+    }
+
+    .panel-exclusiones .titulo-panel {
+      font-size: 0.95rem;
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: #000080;
+    }
+
+    .grid-toggles {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 8px;
+      background-color: #e0e0e0;
+      border: 1px outset #a0a0a0;
+      cursor: pointer;
+      font-size: 0.9rem;
+      user-select: none;
+      transition: background-color 0.15s;
+    }
+
+    .toggle:hover {
+      background-color: #d0d0d0;
+    }
+
+    .toggle.excluida {
+      background-color: #ffd6d6;
+      border-style: inset;
+      color: #800000;
+      text-decoration: line-through;
+    }
+
+    .toggle .indicador {
+      width: 14px;
+      height: 14px;
+      border: 2px inset #808080;
+      background-color: #4caf50;
+      flex-shrink: 0;
+    }
+
+    .toggle.excluida .indicador {
+      background-color: #ff0000;
+    }
+
+    .complejidad {
+      margin: 15px 0 5px;
+      padding: 10px;
+      background-color: #ffffcc;
+      border: 1px solid #808080;
+    }
+
+    .complejidad .fila {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+    }
+
+    .complejidad input[type="range"] {
+      width: 100%;
+      accent-color: #000080;
+    }
+
+    .complejidad .etiqueta-nivel {
+      text-align: center;
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: #000080;
+      margin-top: 2px;
+    }
+
+    #resultado {
+      font-family: "Courier New", Courier, monospace;
+      font-size: 1.2rem;
+      padding: 12px;
+      background-color: #ffffcc;
+      border: 2px inset #808080;
+      word-break: break-all;
+      min-height: 1.4em;
+      margin: 18px 0;
+      color: #000000;
+    }
+
+    #passwordUsuario {
+      font-family: "Courier New", Courier, monospace;
+      font-size: 1.1rem;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 10px;
+      background-color: #ffffcc;
+      border: 2px inset #808080;
+      color: #000000;
+    }
+
+    button {
+      font-family: "Times New Roman", Times, serif;
+      width: 100%;
+      padding: 8px;
+      margin-top: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+      background-color: #c0c0c0;
+      color: #000000;
+      border-top: 2px solid #ffffff;
+      border-left: 2px solid #ffffff;
+      border-right: 2px solid #404040;
+      border-bottom: 2px solid #404040;
+      border-style: outset;
+    }
+
+    button:active {
+      border-top: 2px solid #404040;
+      border-left: 2px solid #404040;
+      border-right: 2px solid #ffffff;
+      border-bottom: 2px solid #ffffff;
+      border-style: inset;
+    }
+
+    .medidor-contenedor {
+      margin-top: 15px;
+    }
+
+    .barra-fondo {
+      width: 100%;
+      height: 22px;
+      background-color: #e0e0e0;
+      border: 2px inset #808080;
+      overflow: hidden;
+    }
+
+    #barraFuerza {
+      height: 100%;
+      width: 0%;
+      background-color: #ff0000;
+      transition: width 0.2s, background-color 0.2s;
+    }
+
+    #textoFuerza {
+      margin-top: 6px;
+      font-size: 0.95rem;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .pie {
+      text-align: center;
+      font-size: 0.8rem;
+      color: #404040;
+      margin-top: 18px;
+    }
+
+    .explicacion {
+      margin-top: 25px;
+      padding-top: 15px;
+      border-top: 1px solid #c0c0c0;
+    }
+
+    .explicacion h2 {
+      font-size: 1.1rem;
+      color: #000080;
+      text-decoration: underline;
+      margin-bottom: 10px;
+    }
+
+    .explicacion p {
+      font-size: 0.95rem;
+      line-height: 1.5;
+      margin: 10px 0;
+      text-align: justify;
+    }
+
+    .idioma {
+      text-align: right;
+      font-size: 0.85rem;
+      margin-bottom: 8px;
+    }
+
+    .idioma a {
+      color: #000080;
+      text-decoration: underline;
+    }
+
+    .idioma a:hover {
+      color: #ff0000;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+
+    <div class="idioma">
+      English | <a href="/es/">Español</a>
+    </div>
+
+    <h1>Generador de Contraseñas</h1>
+    <hr>
+
+    <div class="columnas">
+
+      <div class="columna">
+        <h2>Generar contraseña</h2>
+
+        <label>Longitud: <span id="longitudValor">16</span> caracteres</label>
+        <input type="range" id="longitud" min="8" max="64" value="16">
+
+        <div class="panel-exclusiones">
+          <div class="titulo-panel">Excluir categorías (pulsa para desactivar)</div>
+          <div class="grid-toggles">
+            <div class="toggle" data-clave="mayusculas">
+              <span>Mayúsculas</span>
+              <span class="indicador"></span>
+            </div>
+            <div class="toggle" data-clave="minusculas">
+              <span>Minúsculas</span>
+              <span class="indicador"></span>
+            </div>
+            <div class="toggle" data-clave="numeros">
+              <span>Números</span>
+              <span class="indicador"></span>
+            </div>
+            <div class="toggle" data-clave="simbolos">
+              <span>Símbolos</span>
+              <span class="indicador"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="complejidad">
+          <div class="fila">
+            <span>Complejidad mínima</span>
+            <span>Máxima</span>
+          </div>
+          <input type="range" id="complejidad" min="0" max="2" step="1" value="1">
+          <div class="etiqueta-nivel" id="etiquetaComplejidad">Equilibrada</div>
+        </div>
+
+        <div id="resultado">Pulsa "Generar"</div>
+
+        <button id="generar">Generar contraseña</button>
+        <button id="copiar">Copiar al portapapeles</button>
+      </div>
+
+      <div class="columna">
+        <h2>Comprobar tu contraseña</h2>
+
+        <label for="passwordUsuario">Escribe tu contraseña:</label>
+        <input type="text" id="passwordUsuario" placeholder="Escribe aquí..." autocomplete="off" spellcheck="false">
+
+        <div class="medidor-contenedor">
+          <div class="barra-fondo">
+            <div id="barraFuerza"></div>
+          </div>
+          <div id="textoFuerza">Escribe algo para ver la fuerza</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="explicacion">
+      <h2>¿Para qué sirve esta herramienta?</h2>
+      <p>Crea claves aleatorias y fuertes directamente en tu navegador. No necesitas registrarte ni instalar nada. Todo el proceso ocurre en tu dispositivo, así que la contraseña generada nunca se envía a ningún servidor ni se guarda en ningún sitio.</p>
+      <p>Comprueba si tu contraseña es realmente segura. Es una forma sencilla de detectar contraseñas débiles, cortas o con patrones predecibles antes de que supongan un riesgo.</p>
+      <p>Usar contraseñas largas y aleatorias es una manera eficaz de proteger tus cuentas. Se recomienda una contraseña de 16 caracteres con mayúsculas, minúsculas, números y símbolos. ¡Haz que tus contraseñas sean indescifrables!</p>
+    </div>
+
+    <hr>
+    <div class="pie">
+      2026 &middot; 
+    </div>
+  </div>
+
+  <script>
+    const $ = id => document.getElementById(id);
+
+    const conjuntos = {
+      mayusculas: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+      minusculas: "abcdefghijklmnopqrstuvwxyz",
+      numeros: "0123456789",
+      simbolos: "!@#$%^&*()_+-=[]{}|;:,.<>?"
+    };
+
+    const excluidas = new Set();
+
+    document.querySelectorAll(".toggle").forEach(toggle => {
+      toggle.addEventListener("click", () => {
+        const clave = toggle.dataset.clave;
+        if (excluidas.has(clave)) {
+          excluidas.delete(clave);
+          toggle.classList.remove("excluida");
+        } else {
+          if (excluidas.size >= 3) {
+            $("resultado").textContent = "Debes dejar al menos una categoría activa";
+            return;
+          }
+          excluidas.add(clave);
+          toggle.classList.add("excluida");
+        }
+        generarPassword();
+      });
+    });
+
+    const nivelesComplejidad = [
+      { texto: "Simple",     longitudMin: 8,  longitudMax: 12 },
+      { texto: "Equilibrada", longitudMin: 12, longitudMax: 24 },
+      { texto: "Máxima",     longitudMin: 20, longitudMax: 40 }
+    ];
+
+    function aplicarComplejidad() {
+      const nivel = parseInt($("complejidad").value);
+      const config = nivelesComplejidad[nivel];
+      $("etiquetaComplejidad").textContent = config.texto;
+
+      const sliderLongitud = $("longitud");
+      sliderLongitud.min = config.longitudMin;
+      sliderLongitud.max = config.longitudMax;
+      if (parseInt(sliderLongitud.value) < config.longitudMin) sliderLongitud.value = config.longitudMin;
+      if (parseInt(sliderLongitud.value) > config.longitudMax) sliderLongitud.value = config.longitudMax;
+      $("longitudValor").textContent = sliderLongitud.value;
+
+      generarPassword();
+    }
+
+    $("complejidad").addEventListener("input", aplicarComplejidad);
+
+    $("longitud").addEventListener("input", e => {
+      $("longitudValor").textContent = e.target.value;
+    });
+
+    function generarPassword() {
+      let caracteres = "";
+
+      for (const clave in conjuntos) {
+        if (!excluidas.has(clave)) caracteres += conjuntos[clave];
+      }
+
+      if (!caracteres) {
+        $("resultado").textContent = "Selecciona al menos una categoría";
+        return;
+      }
+
+      const nivel = parseInt($("complejidad").value);
+      const longitud = parseInt($("longitud").value);
+
+      let password = "";
+
+      if (nivel === 2) {
+        const activas = Object.keys(conjuntos).filter(k => !excluidas.has(k));
+        activas.forEach(clave => {
+          const pool = conjuntos[clave];
+          const array = new Uint32Array(1);
+          crypto.getRandomValues(array);
+          password += pool[array[0] % pool.length];
+        });
+      }
+
+      const array = new Uint32Array(longitud - password.length);
+      crypto.getRandomValues(array);
+
+      for (let i = 0; i < array.length; i++) {
+        password += caracteres[array[i] % caracteres.length];
+      }
+
+      password = password.split("").sort(() => {
+        const r = new Uint32Array(1);
+        crypto.getRandomValues(r);
+        return (r[0] % 3) - 1;
+      }).join("");
+
+      $("resultado").textContent = password;
+    }
+
+    $("generar").addEventListener("click", generarPassword);
+
+    $("copiar").addEventListener("click", async () => {
+      const texto = $("resultado").textContent;
+      if (!texto || texto === "Pulsa \"Generar\"" || texto.startsWith("Selecciona") || texto.startsWith("Debes")) return;
+      try {
+        await navigator.clipboard.writeText(texto);
+        $("copiar").textContent = "Copiado";
+        setTimeout(() => $("copiar").textContent = "Copiar al portapapeles", 1500);
+      } catch {
+        alert("No se pudo copiar. Selecciona el texto manualmente.");
+      }
+    });
+
+    function calcularFuerza(pwd) {
+      if (!pwd) return 0;
+      let puntos = 0;
+      puntos += Math.min(40, pwd.length * 2.5);
+
+      const tipos = [/[a-z]/, /[A-Z]/, /[0-9]/, /[^a-zA-Z0-9]/];
+      tipos.forEach(regex => { if (regex.test(pwd)) puntos += 10; });
+
+      const unicos = new Set(pwd).size;
+      puntos += Math.min(20, (unicos / pwd.length) * 20);
+
+      let repeticiones = 0;
+      for (let i = 1; i < pwd.length; i++) {
+        if (pwd[i] === pwd[i - 1]) repeticiones++;
+      }
+      puntos -= Math.min(15, repeticiones * 3);
+
+      const secuenciasObvias = ["1234", "abcd", "qwerty", "asdf", "password", "0000"];
+      if (secuenciasObvias.some(s => pwd.toLowerCase().includes(s))) puntos -= 20;
+
+      return Math.max(0, Math.min(100, Math.round(puntos)));
+    }
+
+    function nivelDeFuerza(puntos) {
+      if (puntos < 20) return { color: "#ff0000", texto: "Muy débil" };
+      if (puntos < 40) return { color: "#ff6600", texto: "Débil" };
+      if (puntos < 60) return { color: "#e6c200", texto: "Aceptable" };
+      if (puntos < 80) return { color: "#4caf50", texto: "Fuerte" };
+      return { color: "#006400", texto: "Muy fuerte" };
+    }
+
+    function actualizarMedidor() {
+      const pwd = $("passwordUsuario").value;
+      const puntos = calcularFuerza(pwd);
+      const info = nivelDeFuerza(puntos);
+
+      $("barraFuerza").style.width = puntos + "%";
+      $("barraFuerza").style.backgroundColor = info.color;
+      $("textoFuerza").textContent = pwd ? info.texto : "Escribe algo para ver la fuerza";
+      $("textoFuerza").style.color = pwd ? info.color : "#404040";
+    }
+
+    $("passwordUsuario").addEventListener("input", actualizarMedidor);
+
+    aplicarComplejidad();
+    generarPassword();
+  </script>
+</body>
+</html>
